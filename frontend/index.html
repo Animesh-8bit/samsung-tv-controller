@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Samsung Smart TV Controller</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+</head>
+<body>
+
+  <!-- Modal Backdrop for Drawers / Popups -->
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+
+  <!-- Floating Dynamic macOS-Style Tooltip -->
+  <div id="tooltip" class="floating-tooltip"></div>
+
+  <div class="remote-container">
+    
+    <!-- TV Header & Status Bar -->
+    <header class="remote-header">
+      <div class="status-indicator">
+        <span class="status-dot" id="statusDot"></span>
+        <div class="tv-meta">
+          <div class="tv-title" id="tvName">Samsung Smart TV</div>
+          <div class="tv-sub" id="tvSub">Connecting...</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btnToggleSound"
+          data-tooltip-title="Sound Feedback"
+          data-tooltip-desc="Toggle tactile click sounds">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+        <button class="icon-btn" id="btnOpenSettings"
+          data-tooltip-title="Settings & Discovery"
+          data-tooltip-desc="Scan LAN and configure TV network settings">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Command Row (Power, Source, Info, Guide) -->
+    <div class="btn-row top-row">
+      <button class="remote-btn power-btn" id="btnPower"
+        data-tooltip-title="Power Toggle"
+        data-tooltip-desc="Wake TV (WOL) or put into standby"
+        data-tooltip-key="P">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+      </button>
+      <button class="remote-btn pill-btn" data-key="KEY_SOURCE"
+        data-tooltip-title="Input Source"
+        data-tooltip-desc="Switch between HDMI and TV inputs">
+        <span>SOURCE</span>
+      </button>
+      <button class="remote-btn pill-btn" data-key="KEY_INFO"
+        data-tooltip-title="Display Info"
+        data-tooltip-desc="Show program, resolution, or stream info">
+        <span>INFO</span>
+      </button>
+      <button class="remote-btn pill-btn" data-key="KEY_GUIDE"
+        data-tooltip-title="Program Guide"
+        data-tooltip-desc="Open TV Electronic Program Guide">
+        <span>GUIDE</span>
+      </button>
+    </div>
+
+    <!-- Directional Navigation Pad (Apple TV / Samsung Style) -->
+    <div class="dpad-wrapper">
+      <div class="dpad-ring">
+        <button class="dpad-btn dpad-up" data-key="KEY_UP"
+          data-tooltip-title="Navigate Up"
+          data-tooltip-desc="Move cursor up"
+          data-tooltip-key="↑">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <polygon points="12,5 5,16 19,16"></polygon>
+          </svg>
+        </button>
+        <button class="dpad-btn dpad-left" data-key="KEY_LEFT"
+          data-tooltip-title="Navigate Left"
+          data-tooltip-desc="Move cursor left"
+          data-tooltip-key="←">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <polygon points="5,12 16,5 16,19"></polygon>
+          </svg>
+        </button>
+        <button class="dpad-btn dpad-center" data-key="KEY_ENTER"
+          data-tooltip-title="Select / OK"
+          data-tooltip-desc="Confirm selection or open item"
+          data-tooltip-key="Enter">
+          <span>OK</span>
+        </button>
+        <button class="dpad-btn dpad-right" data-key="KEY_RIGHT"
+          data-tooltip-title="Navigate Right"
+          data-tooltip-desc="Move cursor right"
+          data-tooltip-key="→">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <polygon points="19,12 8,5 8,19"></polygon>
+          </svg>
+        </button>
+        <button class="dpad-btn dpad-down" data-key="KEY_DOWN"
+          data-tooltip-title="Navigate Down"
+          data-tooltip-desc="Move cursor down"
+          data-tooltip-key="↓">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <polygon points="12,19 5,8 19,8"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Essential System Nav Row (Back, Home, Menu, Exit) -->
+    <div class="btn-row nav-row">
+      <button class="remote-btn round-btn" data-key="KEY_RETURN"
+        data-tooltip-title="Back / Return"
+        data-tooltip-desc="Return to previous screen or close dialog"
+        data-tooltip-key="Esc">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 14 4 9 9 4"></polyline>
+          <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path>
+        </svg>
+      </button>
+      <button class="remote-btn round-btn accent-home" data-key="KEY_HOME"
+        data-tooltip-title="Smart Hub / Home"
+        data-tooltip-desc="Open TV home dashboard and launcher"
+        data-tooltip-key="H">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </button>
+      <button class="remote-btn round-btn" data-key="KEY_MENU"
+        data-tooltip-title="TV Settings Menu"
+        data-tooltip-desc="Open TV on-screen settings menu">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <button class="remote-btn round-btn" data-key="KEY_EXIT"
+        data-tooltip-title="Exit"
+        data-tooltip-desc="Exit all menus and return to broadcast TV">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Volume & Channel Dual Rockers -->
+    <div class="rockers-section">
+      <!-- Volume Rocker -->
+      <div class="rocker-column">
+        <div class="rocker-label">VOL</div>
+        <div class="rocker-pill">
+          <button class="rocker-btn rocker-up" data-key="KEY_VOLUP"
+            data-tooltip-title="Volume Up"
+            data-tooltip-desc="Increase TV audio level"
+            data-tooltip-key="+">+</button>
+          <button class="rocker-mid-btn" data-key="KEY_MUTE"
+            data-tooltip-title="Mute"
+            data-tooltip-desc="Mute or restore audio"
+            data-tooltip-key="M">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+          <button class="rocker-btn rocker-down" data-key="KEY_VOLDOWN"
+            data-tooltip-title="Volume Down"
+            data-tooltip-desc="Decrease TV audio level"
+            data-tooltip-key="−">−</button>
+        </div>
+      </div>
+
+      <!-- Center Utility Actions -->
+      <div class="center-controls">
+        <button class="remote-btn tool-btn" id="btnToggleKeypad"
+          data-tooltip-title="Numeric Keypad"
+          data-tooltip-desc="Open 0–9 number pad for direct channel tuning"
+          data-tooltip-key="0–9">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <rect x="3" y="3" width="4" height="4" rx="1"></rect>
+            <rect x="10" y="3" width="4" height="4" rx="1"></rect>
+            <rect x="17" y="3" width="4" height="4" rx="1"></rect>
+            <rect x="3" y="10" width="4" height="4" rx="1"></rect>
+            <rect x="10" y="10" width="4" height="4" rx="1"></rect>
+            <rect x="17" y="10" width="4" height="4" rx="1"></rect>
+            <rect x="3" y="17" width="4" height="4" rx="1"></rect>
+            <rect x="10" y="17" width="4" height="4" rx="1"></rect>
+            <rect x="17" y="17" width="4" height="4" rx="1"></rect>
+          </svg>
+          <span>123</span>
+        </button>
+
+        <button class="remote-btn tool-btn" id="btnToggleKeyboard"
+          data-tooltip-title="Send Text Input"
+          data-tooltip-desc="Type search queries from Mac keyboard directly into TV">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <line x1="6" y1="8" x2="6.01" y2="8"></line>
+            <line x1="10" y1="8" x2="10.01" y2="8"></line>
+            <line x1="14" y1="8" x2="14.01" y2="8"></line>
+            <line x1="18" y1="8" x2="18.01" y2="8"></line>
+            <line x1="6" y1="12" x2="6.01" y2="12"></line>
+            <line x1="10" y1="12" x2="10.01" y2="12"></line>
+            <line x1="14" y1="12" x2="14.01" y2="12"></line>
+            <line x1="18" y1="12" x2="18.01" y2="12"></line>
+            <line x1="8" y1="16" x2="16" y2="16"></line>
+          </svg>
+          <span>TEXT</span>
+        </button>
+      </div>
+
+      <!-- Channel Rocker -->
+      <div class="rocker-column">
+        <div class="rocker-label">CH</div>
+        <div class="rocker-pill">
+          <button class="rocker-btn rocker-up" data-key="KEY_CHUP"
+            data-tooltip-title="Channel Up"
+            data-tooltip-desc="Next broadcast channel">▲</button>
+          <button class="rocker-mid-btn text-mid" data-key="KEY_PRECH"
+            data-tooltip-title="Previous Channel"
+            data-tooltip-desc="Jump to previously watched channel">PRE</button>
+          <button class="rocker-btn rocker-down" data-key="KEY_CHDOWN"
+            data-tooltip-title="Channel Down"
+            data-tooltip-desc="Previous broadcast channel">▼</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Media Section with Universal Video Seek Bar & Scrubber -->
+    <div class="media-section">
+      <!-- Universal Video Seek Bar -->
+      <div class="seek-bar-container">
+        <div class="seek-time-label" id="seekTimeCurrent">00:00</div>
+        <div class="seek-slider-wrap" id="seekSliderWrap"
+          data-tooltip-title="Universal Video Scrubber"
+          data-tooltip-desc="Drag or click to scrub video forward or backward">
+          <input type="range" class="seek-slider" id="seekSlider" min="0" max="100" value="0" step="1">
+          <div class="seek-delta-badge" id="seekDeltaBadge">+10s</div>
+        </div>
+        <div class="seek-time-label" id="seekTimeTotal">--:--</div>
+      </div>
+
+      <!-- Quick Seek Step Row -->
+      <div class="seek-step-row">
+        <button class="seek-step-btn" data-seek="-30"
+          data-tooltip-title="Rewind 30s"
+          data-tooltip-desc="Skip backwards 30 seconds"
+          data-tooltip-key="<">⏪ 30s</button>
+        <button class="seek-step-btn" data-seek="-10"
+          data-tooltip-title="Rewind 10s"
+          data-tooltip-desc="Skip backwards 10 seconds"
+          data-tooltip-key="[">⏪ 10s</button>
+        <button class="seek-step-btn" data-seek="10"
+          data-tooltip-title="Forward 10s"
+          data-tooltip-desc="Skip forward 10 seconds"
+          data-tooltip-key="]">10s ⏩</button>
+        <button class="seek-step-btn" data-seek="30"
+          data-tooltip-title="Forward 30s"
+          data-tooltip-desc="Skip forward 30 seconds"
+          data-tooltip-key=">">30s ⏩</button>
+      </div>
+
+      <!-- Media Transport Row -->
+      <div class="btn-row media-row">
+        <button class="remote-btn round-btn" data-key="KEY_REWIND"
+          data-tooltip-title="Rewind"
+          data-tooltip-desc="Rewind video playback">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <polygon points="11,19 2,12 11,5"></polygon>
+            <polygon points="22,19 13,12 22,5"></polygon>
+          </svg>
+        </button>
+        <button class="remote-btn round-btn play-btn" data-key="KEY_PLAYPAUSE" id="btnPlayPause"
+          data-tooltip-title="Play / Pause"
+          data-tooltip-desc="Toggle playback of current movie or music"
+          data-tooltip-key="Space">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <polygon points="5,3 19,12 5,21"></polygon>
+          </svg>
+        </button>
+        <button class="remote-btn round-btn" data-key="KEY_STOP"
+          data-tooltip-title="Stop"
+          data-tooltip-desc="Stop video playback">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+          </svg>
+        </button>
+        <button class="remote-btn round-btn" data-key="KEY_FF"
+          data-tooltip-title="Fast Forward"
+          data-tooltip-desc="Fast forward video playback">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <polygon points="13,19 22,12 13,5"></polygon>
+            <polygon points="2,19 11,12 2,5"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Smart TV Color Keys (Red, Green, Yellow, Blue) -->
+    <div class="btn-row color-row">
+      <button class="color-btn color-red" data-key="KEY_RED"
+        data-tooltip-title="Red (A)"
+        data-tooltip-desc="Interactive TV option A">A</button>
+      <button class="color-btn color-green" data-key="KEY_GREEN"
+        data-tooltip-title="Green (B)"
+        data-tooltip-desc="Interactive TV option B">B</button>
+      <button class="color-btn color-yellow" data-key="KEY_YELLOW"
+        data-tooltip-title="Yellow (C)"
+        data-tooltip-desc="Interactive TV option C">C</button>
+      <button class="color-btn color-blue" data-key="KEY_CYAN"
+        data-tooltip-title="Blue (D)"
+        data-tooltip-desc="Interactive TV option D">D</button>
+    </div>
+
+    <!-- Quick App Dock: Netflix, YouTube, Prime, Hotstar, Samsung Internet -->
+    <div class="apps-section">
+      <div class="section-title">APP SHORTCUTS (CLICK OR PRESS HOTKEY)</div>
+      <div class="apps-grid" id="appsGrid">
+        <!-- Netflix (Key: N) -->
+        <button class="app-card" data-app-id="3201907018807" style="--app-color: #E50914;"
+          data-tooltip-title="Netflix"
+          data-tooltip-desc="Launch Netflix on TV"
+          data-tooltip-key="N">
+          <span class="app-hotkey">N</span>
+          <span class="app-icon">🎬</span>
+          <span class="app-name">Netflix</span>
+        </button>
+
+        <!-- YouTube (Key: Y) -->
+        <button class="app-card" data-app-id="111299001912" style="--app-color: #FF0000;"
+          data-tooltip-title="YouTube"
+          data-tooltip-desc="Launch YouTube on TV"
+          data-tooltip-key="Y">
+          <span class="app-hotkey">Y</span>
+          <span class="app-icon">▶️</span>
+          <span class="app-name">YouTube</span>
+        </button>
+
+        <!-- Amazon Prime Video (Key: A) -->
+        <button class="app-card" data-app-id="3201910019365" style="--app-color: #00A8E1;"
+          data-tooltip-title="Amazon Prime"
+          data-tooltip-desc="Launch Prime Video on TV"
+          data-tooltip-key="A">
+          <span class="app-hotkey">A</span>
+          <span class="app-icon">📦</span>
+          <span class="app-name">Prime Video</span>
+        </button>
+
+        <!-- JioHotstar (Key: J) -->
+        <button class="app-card" data-app-id="3201711015117" style="--app-color: #1F80E0;"
+          data-tooltip-title="JioHotstar"
+          data-tooltip-desc="Launch Hotstar on TV"
+          data-tooltip-key="J">
+          <span class="app-hotkey">J</span>
+          <span class="app-icon">⭐</span>
+          <span class="app-name">JioHotstar</span>
+        </button>
+
+        <!-- Samsung Internet Browser (Key: I) -->
+        <button class="app-card" data-app-id="3201907018784" style="--app-color: #6C5CE7;"
+          data-tooltip-title="Samsung Internet"
+          data-tooltip-desc="Launch TV Web Browser"
+          data-tooltip-key="I">
+          <span class="app-hotkey">I</span>
+          <span class="app-icon">🌐</span>
+          <span class="app-name">Internet</span>
+        </button>
+
+        <!-- Spotify (Key: S) -->
+        <button class="app-card" data-app-id="3201606009684" style="--app-color: #1DB954;"
+          data-tooltip-title="Spotify"
+          data-tooltip-desc="Launch Spotify Music"
+          data-tooltip-key="S">
+          <span class="app-hotkey">S</span>
+          <span class="app-icon">🎵</span>
+          <span class="app-name">Spotify</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer Shortcuts Hint -->
+    <div class="keyboard-hints">
+      <span>⌨️ Hotkeys: [ ] (Seek ±10s) • &lt; &gt; (±30s) • N, Y, A, J, I (Apps)</span>
+    </div>
+
+    <!-- Drawer: Numeric Keypad (Nested cleanly inside remote) -->
+    <div class="drawer" id="keypadDrawer">
+      <div class="drawer-header">
+        <span>NUMERIC KEYPAD</span>
+        <button class="close-drawer" id="closeKeypad" title="Close Keypad">✕</button>
+      </div>
+      <div class="keypad-grid">
+        <button class="keypad-btn" data-key="KEY_1">1</button>
+        <button class="keypad-btn" data-key="KEY_2">2</button>
+        <button class="keypad-btn" data-key="KEY_3">3</button>
+        <button class="keypad-btn" data-key="KEY_4">4</button>
+        <button class="keypad-btn" data-key="KEY_5">5</button>
+        <button class="keypad-btn" data-key="KEY_6">6</button>
+        <button class="keypad-btn" data-key="KEY_7">7</button>
+        <button class="keypad-btn" data-key="KEY_8">8</button>
+        <button class="keypad-btn" data-key="KEY_9">9</button>
+        <button class="keypad-btn action-key" data-key="KEY_PRECH">PRE</button>
+        <button class="keypad-btn" data-key="KEY_0">0</button>
+        <button class="keypad-btn action-key" data-key="KEY_ENTER">OK</button>
+      </div>
+      <button class="action-btn close-modal-btn" id="btnDoneKeypad">Done</button>
+    </div>
+
+    <!-- Drawer: Text Input & URL Launcher -->
+    <div class="drawer" id="textDrawer">
+      <div class="drawer-header">
+        <span>TYPE OR LAUNCH URL ON TV</span>
+        <button class="close-drawer" id="closeText" title="Close">✕</button>
+      </div>
+      <div class="drawer-content">
+        <label>Type text to active TV input field:</label>
+        <div class="input-group">
+          <input type="text" id="tvTextInput" placeholder="Search query or text..." autocomplete="off">
+          <button class="action-btn" id="btnSendText">Send</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <label>Open URL in Samsung TV Browser:</label>
+        <div class="input-group">
+          <input type="url" id="tvUrlInput" placeholder="https://example.com" value="https://">
+          <button class="action-btn" id="btnOpenUrl">Open</button>
+        </div>
+
+        <button class="action-btn close-modal-btn" id="btnDoneText">Done</button>
+      </div>
+    </div>
+
+    <!-- Drawer: Settings & Device Discovery -->
+    <div class="drawer" id="settingsDrawer">
+      <div class="drawer-header">
+        <span>CONTROLLER SETTINGS & DISCOVERY</span>
+        <button class="close-drawer" id="closeSettings" title="Close Settings (Esc)">✕</button>
+      </div>
+      <div class="drawer-content">
+        <div class="form-group">
+          <label>TV IP Address:</label>
+          <input type="text" id="settingIp" placeholder="192.168.1.5">
+        </div>
+        <div class="form-group">
+          <label>TV MAC Address (for Wake-on-LAN):</label>
+          <input type="text" id="settingMac" placeholder="68:FC:CA:33:88:DA">
+        </div>
+        <div class="form-group">
+          <label>WebSocket Port:</label>
+          <input type="number" id="settingPort" value="8002">
+        </div>
+
+        <div class="settings-btns">
+          <button class="action-btn save-btn" id="btnSaveSettings">Save Settings</button>
+          <button class="action-btn discover-btn" id="btnRunDiscovery">🔍 Scan LAN for TVs</button>
+        </div>
+
+        <div class="discovery-results" id="discoveryResults"></div>
+
+        <button class="action-btn close-modal-btn" id="btnDoneSettings">Close Settings</button>
+      </div>
+    </div>
+
+  </div> <!-- End remote-container -->
+
+  <!-- Toast Notification Overlay -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

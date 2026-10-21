@@ -1,0 +1,8 @@
+{
+  "ip": "192.168.1.100",
+  "mac": "AA:BB:CC:DD:EE:FF",
+  "port": 8002,
+  "name": "SamsungTvRemote",
+  "token_file": "tv_token.txt",
+  "sdb_port": 26101
+}

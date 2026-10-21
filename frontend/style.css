@@ -1,0 +1,1075 @@
+/* ==========================================================================
+   Samsung Smart TV Controller - macOS Native Theme (Non-Scrollable & Resizable)
+   ========================================================================== */
+
+:root {
+  --bg-app: #14151b;
+  --remote-bg: #1c1d24;
+  --remote-border: rgba(255, 255, 255, 0.08);
+  --btn-bg: #23252d;
+  --btn-bg-hover: #2e303a;
+  --btn-bg-active: #3a3d4a;
+  --btn-text: #f0f0f4;
+  --btn-subtext: #8b8f9e;
+  --accent-red: #ff453a;
+  --accent-green: #30d158;
+  --accent-blue: #0a84ff;
+  --accent-yellow: #ffd60a;
+  --accent-purple: #bf5af2;
+  --shadow-subtle: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.5);
+  --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  background-color: var(--bg-app);
+  font-family: var(--font-stack);
+  color: var(--btn-text);
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* ==========================================================================
+   Modal Backdrop Overlay
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   Floating Tooltip Engine
+   ========================================================================== */
+
+.floating-tooltip {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px) scale(0.96);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  background: rgba(22, 24, 30, 0.96);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 
+    0 10px 28px rgba(0, 0, 0, 0.65),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.floating-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.tooltip-title {
+  font-weight: 600;
+  color: #fff;
+}
+
+.tooltip-desc {
+  color: #9da1b2;
+  font-weight: 400;
+}
+
+.tooltip-badge {
+  background: rgba(10, 132, 255, 0.22);
+  border: 1px solid rgba(10, 132, 255, 0.45);
+  color: #5ac8fa;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: ui-monospace, Menlo, Monaco, monospace;
+}
+
+/* ==========================================================================
+   Remote Chassis (Non-Scrollable, Resizable & Elastic)
+   ========================================================================== */
+
+.remote-container {
+  width: 100%;
+  height: 100vh;
+  max-width: 100%;
+  background: linear-gradient(180deg, #22242c 0%, #14151a 100%);
+  padding: clamp(10px, 1.8vh, 20px) clamp(14px, 4vw, 24px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden !important;
+  box-sizing: border-box;
+}
+
+/* Header & Status (Draggable Titlebar Region) */
+.remote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: clamp(6px, 1vh, 12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  -webkit-app-region: drag; /* Makes top area draggable on macOS */
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #555;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.status-dot.online {
+  background-color: var(--accent-green);
+  box-shadow: 0 0 10px var(--accent-green);
+}
+
+.status-dot.standby {
+  background-color: var(--accent-yellow);
+  box-shadow: 0 0 10px var(--accent-yellow);
+}
+
+.status-dot.offline {
+  background-color: var(--accent-red);
+  box-shadow: 0 0 8px var(--accent-red);
+}
+
+.tv-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: #fff;
+}
+
+.tv-sub {
+  font-size: 9.5px;
+  color: var(--btn-subtext);
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--btn-subtext);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.icon-btn.muted {
+  opacity: 0.4;
+}
+
+/* ==========================================================================
+   Buttons & Rows
+   ========================================================================== */
+
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(6px, 1.5vw, 10px);
+}
+
+.remote-btn {
+  background: linear-gradient(180deg, #2a2c35 0%, #1f2027 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--btn-text);
+  cursor: pointer;
+  box-shadow: var(--shadow-inset), 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.08s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  outline: none;
+}
+
+.remote-btn:active, .remote-btn.is-active {
+  transform: translateY(1.5px) scale(0.97);
+  background: #181920;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Power Button */
+.power-btn {
+  width: clamp(38px, 5.5vh, 46px);
+  height: clamp(38px, 5.5vh, 46px);
+  border-radius: 50%;
+  color: var(--accent-red);
+  background: linear-gradient(180deg, #332024 0%, #221518 100%);
+  border: 1px solid rgba(255, 69, 58, 0.25);
+  box-shadow: var(--shadow-inset), 0 0 12px rgba(255, 69, 58, 0.15);
+}
+
+.power-btn:hover {
+  box-shadow: var(--shadow-inset), 0 0 18px rgba(255, 69, 58, 0.35);
+  color: #ff6b62;
+}
+
+.power-btn:active {
+  background: #190f11;
+}
+
+/* Pill Buttons (Source, Info, Guide) */
+.pill-btn {
+  flex: 1;
+  height: clamp(32px, 4.4vh, 38px);
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--btn-subtext);
+}
+
+.pill-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================================================
+   Circular D-Pad Navigation
+   ========================================================================== */
+
+.dpad-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(4px, 1vh, 10px) 0;
+}
+
+.dpad-ring {
+  width: clamp(160px, 24vh, 215px);
+  height: clamp(160px, 24vh, 215px);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #272a33 0%, #191a20 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 12px 28px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(255, 255, 255, 0.12),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.8);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dpad-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  color: #c0c3d0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease;
+  outline: none;
+}
+
+.dpad-btn:hover {
+  color: #fff;
+}
+
+.dpad-btn:active, .dpad-btn.is-active {
+  color: var(--accent-blue);
+  transform: scale(0.92);
+}
+
+.dpad-up {
+  top: 6px;
+  width: 48%;
+  height: 32%;
+}
+
+.dpad-down {
+  bottom: 6px;
+  width: 48%;
+  height: 32%;
+}
+
+.dpad-left {
+  left: 6px;
+  width: 32%;
+  height: 48%;
+}
+
+.dpad-right {
+  right: 6px;
+  width: 32%;
+  height: 48%;
+}
+
+.dpad-center {
+  width: clamp(60px, 9.5vh, 84px);
+  height: clamp(60px, 9.5vh, 84px);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #323541 0%, #20222a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.dpad-center:hover {
+  background: linear-gradient(180deg, #3a3d4c 0%, #262832 100%);
+}
+
+.dpad-center:active, .dpad-center.is-active {
+  transform: scale(0.93);
+  background: #191a20;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   Navigation Row (Back, Home, Menu, Exit)
+   ========================================================================== */
+
+.nav-row {
+  padding: 0 4px;
+}
+
+.round-btn {
+  width: clamp(38px, 5.5vh, 46px);
+  height: clamp(38px, 5.5vh, 46px);
+  border-radius: 50%;
+}
+
+.accent-home {
+  color: var(--accent-blue);
+  border-color: rgba(10, 132, 255, 0.25);
+}
+
+.accent-home:hover {
+  box-shadow: 0 0 12px rgba(10, 132, 255, 0.25);
+}
+
+/* ==========================================================================
+   Dual Rocker Pillars (Volume & Channel)
+   ========================================================================== */
+
+.rockers-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 clamp(4px, 2vw, 12px);
+}
+
+.rocker-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rocker-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--btn-subtext);
+  letter-spacing: 0.8px;
+}
+
+.rocker-pill {
+  width: clamp(44px, 6vh, 52px);
+  height: clamp(90px, 13.5vh, 116px);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #272a34 0%, #1c1d24 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-inset), 0 6px 14px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px;
+}
+
+.rocker-btn {
+  width: 90%;
+  height: 34%;
+  border-radius: 16px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease;
+  outline: none;
+}
+
+.rocker-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rocker-btn:active, .rocker-btn.is-active {
+  transform: scale(0.9);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.rocker-mid-btn {
+  width: 75%;
+  height: 24%;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: var(--btn-subtext);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease;
+  outline: none;
+}
+
+.rocker-mid-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.rocker-mid-btn:active, .rocker-mid-btn.is-active {
+  transform: scale(0.9);
+}
+
+.text-mid {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.center-controls {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.2vh, 12px);
+}
+
+.tool-btn {
+  width: clamp(48px, 6.8vw, 56px);
+  height: clamp(38px, 5.2vh, 46px);
+  border-radius: 12px;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--btn-subtext);
+}
+
+.tool-btn:hover {
+  color: #fff;
+}
+
+/* ==========================================================================
+   Media Transport & Color Buttons
+   ========================================================================== */
+
+/* ==========================================================================
+   Universal Video Seek Bar & Media Scrubber
+   ========================================================================== */
+
+.media-section {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.7vh, 8px);
+  width: 100%;
+}
+
+.seek-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0 clamp(4px, 2vw, 12px);
+  box-sizing: border-box;
+}
+
+.seek-time-label {
+  font-family: ui-monospace, Menlo, Monaco, monospace;
+  font-size: clamp(9px, 1.15vh, 10.5px);
+  font-weight: 600;
+  color: #8b8f9e;
+  min-width: 34px;
+  user-select: none;
+}
+
+#seekTimeCurrent {
+  text-align: left;
+}
+
+#seekTimeTotal {
+  text-align: right;
+}
+
+.seek-slider-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.seek-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: clamp(4px, 0.55vh, 6px);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.seek-slider:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.seek-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: clamp(12px, 1.5vh, 15px);
+  height: clamp(12px, 1.5vh, 15px);
+  border-radius: 50%;
+  background: #0a84ff;
+  box-shadow: 0 0 8px rgba(10, 132, 255, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  border: 2px solid #fff;
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.seek-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #409cff;
+}
+
+.seek-slider:active::-webkit-slider-thumb {
+  transform: scale(1.3);
+  background: #5ac8fa;
+}
+
+.seek-delta-badge {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 132, 255, 0.95);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: ui-monospace, Menlo, Monaco, monospace;
+  padding: 1px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.seek-delta-badge.show {
+  opacity: 1;
+}
+
+/* Quick Seek Step Row */
+.seek-step-row {
+  display: flex;
+  justify-content: space-between;
+  gap: clamp(4px, 1vw, 6px);
+  width: 100%;
+  padding: 0 clamp(4px, 2vw, 12px);
+  box-sizing: border-box;
+}
+
+.seek-step-btn {
+  flex: 1;
+  height: clamp(18px, 2.4vh, 23px);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: #a4a9b8;
+  font-size: clamp(9px, 1.1vh, 10px);
+  font-weight: 600;
+  font-family: ui-monospace, -apple-system, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+  outline: none;
+}
+
+.seek-step-btn:hover {
+  background: rgba(10, 132, 255, 0.2);
+  border-color: rgba(10, 132, 255, 0.4);
+  color: #fff;
+}
+
+.seek-step-btn:active, .seek-step-btn.is-active {
+  transform: scale(0.95);
+  background: rgba(10, 132, 255, 0.4);
+  color: #fff;
+}
+
+.media-row {
+  padding: 0 clamp(4px, 2vw, 12px);
+}
+
+.media-row .round-btn {
+  width: clamp(34px, 4.8vh, 42px);
+  height: clamp(34px, 4.8vh, 42px);
+  color: #b0b4c4;
+}
+
+.play-btn {
+  color: #fff !important;
+  background: linear-gradient(180deg, #353846 0%, #252731 100%);
+}
+
+.color-row {
+  padding: 0 clamp(4px, 2vw, 12px);
+}
+
+.color-btn {
+  flex: 1;
+  height: clamp(18px, 2.4vh, 22px);
+  border-radius: 11px;
+  border: none;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.08s ease, filter 0.15s ease;
+  outline: none;
+}
+
+.color-btn:active, .color-btn.is-active {
+  transform: scale(0.92);
+}
+
+.color-red { background: #ff3b30; color: #fff; }
+.color-green { background: #34c759; color: #000; }
+.color-yellow { background: #ffcc00; color: #000; }
+.color-blue { background: #007aff; color: #fff; }
+
+/* ==========================================================================
+   Quick Apps Dock & Shortcut Badges
+   ========================================================================== */
+
+.apps-section {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  padding: clamp(6px, 1vh, 10px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.section-title {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: var(--btn-subtext);
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(4px, 1vw, 8px);
+}
+
+.app-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: clamp(4px, 0.8vh, 7px) 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  color: #fff;
+  outline: none;
+  position: relative;
+}
+
+.app-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--app-color);
+  transform: translateY(-1px);
+}
+
+.app-card:active {
+  transform: scale(0.94);
+}
+
+.app-card.app-card-active {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--app-color);
+  box-shadow: 0 0 16px var(--app-color);
+  transform: scale(0.95);
+}
+
+.app-hotkey {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  color: #8b8f9e;
+  font-size: 7.5px;
+  font-weight: 700;
+  padding: 0 3px;
+  font-family: ui-monospace, Menlo, Monaco, monospace;
+}
+
+.app-card:hover .app-hotkey {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.app-icon {
+  font-size: clamp(13px, 2vh, 16px);
+}
+
+.app-name {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+}
+
+/* ==========================================================================
+   Footer Keyboard Hints
+   ========================================================================== */
+
+.keyboard-hints {
+  text-align: center;
+  font-size: 9px;
+  color: var(--btn-subtext);
+  opacity: 0.8;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   Drawers & Modals (Keypad, Text, Settings)
+   ========================================================================== */
+
+.drawer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 90%;
+  overflow-y: auto;
+  background: #1b1d24;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.8);
+  padding: 16px 20px 20px;
+  z-index: 100;
+  transform: translateY(105%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer.open {
+  transform: translateY(0);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #fff;
+  margin-bottom: 14px;
+}
+
+.close-drawer {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #c0c3d0;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.close-drawer:hover {
+  color: #fff;
+  background: rgba(255, 69, 58, 0.25);
+  border-color: rgba(255, 69, 58, 0.5);
+  transform: scale(1.08);
+}
+
+.close-drawer:active {
+  transform: scale(0.94);
+}
+
+/* Keypad Grid */
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.keypad-btn {
+  height: clamp(38px, 5vh, 44px);
+  border-radius: 12px;
+  background: #252833;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease;
+}
+
+.keypad-btn:active {
+  transform: scale(0.92);
+  background: #1a1b22;
+}
+
+.keypad-btn.action-key {
+  font-size: 11px;
+  color: var(--accent-blue);
+}
+
+/* Drawer Forms & Inputs */
+.drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.drawer-content label {
+  font-size: 10.5px;
+  color: var(--btn-subtext);
+  font-weight: 500;
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.input-group input, .form-group input {
+  flex: 1;
+  background: #272a35;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #fff;
+  font-size: 12px;
+  outline: none;
+  font-family: inherit;
+}
+
+.input-group input:focus, .form-group input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.2);
+}
+
+.action-btn {
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+
+.action-btn:active {
+  transform: scale(0.96);
+}
+
+.close-modal-btn {
+  width: 100%;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--btn-text);
+  margin-top: 4px;
+}
+
+.close-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 2px 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.save-btn {
+  flex: 1;
+  height: 36px;
+}
+
+.discover-btn {
+  flex: 1;
+  height: 36px;
+  background: #323544;
+}
+
+.discovery-results {
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.discovered-item {
+  background: #252833;
+  padding: 6px 8px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.discovered-item:hover {
+  border-color: var(--accent-blue);
+}
+
+/* Toast Message */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(30, 32, 40, 0.94);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 16px;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 200;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
